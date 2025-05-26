@@ -1,0 +1,68 @@
+# React Native
+node_modules/
+npm-debug.log
+yarn-error.log
+.env
+.env.*.local
+
+# macOS
+.DS_Store
+
+# Android
+android/.gradle
+android/app/build/
+android/build/
+android/local.properties
+android/.idea/
+android/*.iml
+android/.cxx/
+
+# iOS
+ios/Pods/
+ios/build/
+ios/DerivedData/
+ios/.idea/
+ios/*.xcworkspace
+ios/*.xcodeproj/project.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+
+# Watchman
+.watchmanconfig
+
+# Metro
+.expo/
+.expo-shared/
+metro-cache/
+haul-debug.log
+*.hprof
+
+# Buck
+.buckd/
+buck-out/
+.buckconfig.local
+
+# Fastlane
+ios/fastlane/report.xml
+ios/fastlane/Preview.html
+ios/fastlane/screenshots/
+ios/fastlane/test_output/
+
+# CodePush
+codepush.*.js
+
+# Misc
+*.keystore
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# VSCode
+.vscode/
+
+# Xcode
+*.xcuserstate
+
+# Logs
+*.log

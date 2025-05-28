@@ -1,24 +1,25 @@
-import Constants from 'expo-constants';
+// src/components/Main.jsx
 import { StyleSheet, View } from 'react-native';
 import RepositoryList from './RepositoryList';
+import AppBar from './AppBar'; // Import AppBar
 import theme from '../theme';
 
 const styles = StyleSheet.create({
   container: {
-    marginTop: Constants.statusBarHeight, // Keep this for now, will be removed in 10.4
+    // marginTop: Constants.statusBarHeight, // REMOVE THIS LINE
     flexGrow: 1,
     flexShrink: 1,
-    backgroundColor: theme.colors.mainBackground // Use theme color
+    backgroundColor: theme.colors.mainBackground
   }
 });
 
 const Main = () => {
   return (
     <View style={styles.container}>
+      <AppBar />
       <RepositoryList />
     </View>
   );
 };
 
 export default Main;
-// This component serves as the main entry point for the Rate Repository application.

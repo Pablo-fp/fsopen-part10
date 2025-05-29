@@ -1,15 +1,17 @@
 // src/components/Main.jsx
+import React from 'react'; // Ensure React is imported
 import { StyleSheet, View } from 'react-native';
+import { Route, Routes, Navigate } from 'react-router-native';
+
 import RepositoryList from './RepositoryList';
-import AppBar from './AppBar'; // Import AppBar
+import AppBar from './AppBar';
 import theme from '../theme';
 
 const styles = StyleSheet.create({
   container: {
-    // marginTop: Constants.statusBarHeight, // REMOVE THIS LINE
+    backgroundColor: theme.colors.mainBackground, // Ensure this color is in your theme
     flexGrow: 1,
-    flexShrink: 1,
-    backgroundColor: theme.colors.mainBackground
+    flexShrink: 1
   }
 });
 
@@ -17,6 +19,10 @@ const Main = () => {
   return (
     <View style={styles.container}>
       <AppBar />
+      <Routes>
+        <Route path="/" element={<RepositoryList />} exact />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
       <RepositoryList />
     </View>
   );

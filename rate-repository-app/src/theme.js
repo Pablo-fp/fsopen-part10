@@ -1,21 +1,28 @@
 // src/theme.js
+import { Platform } from 'react-native'; // Import Platform
+
 const theme = {
   colors: {
     textPrimary: '#24292e',
     textSecondary: '#586069',
     primary: '#0366d6',
-    appBarBackground: '#24292e', // Added for app bar
-    mainBackground: '#e1e4e8', // For overall background
-    repositoryItemBackground: 'white', // For item background
-    error: '#d73a4a' // For error messages
+    appBarBackground: '#24292e',
+    mainBackground: '#e1e4e8',
+    repositoryItemBackground: 'white',
+    error: '#d73a4a'
   },
   fontSizes: {
     body: 14,
     subheading: 16,
-    heading: 20 // Example, can add more
+    heading: 20
   },
   fonts: {
-    main: 'System' // This will be updated in Exercise 10.10
+    main: Platform.select({
+      // Use Platform.select
+      android: 'Roboto',
+      ios: 'Arial',
+      default: 'System'
+    })
   },
   fontWeights: {
     normal: '400',

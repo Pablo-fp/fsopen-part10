@@ -38,8 +38,6 @@ const FormikTextInput = ({ name, style, ...props }) => {
         onChangeText={(value) => helpers.setValue(value)}
         onBlur={() => helpers.setTouched(true)}
         value={field.value}
-        // The 'error' prop is not standard for NativeTextInput unless you customize it.
-        // The styling for error state is handled by `showError && styles.inputError`
         style={[
           styles.inputField,
           showError && styles.inputError,

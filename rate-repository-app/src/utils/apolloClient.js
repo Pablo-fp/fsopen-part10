@@ -1,19 +1,9 @@
-// src/utils/apolloClient.js
-import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client'; // Added createHttpLink
-import Constants from 'expo-constants';
+import { ApolloClient, InMemoryCache } from '@apollo/client';
 
-const APOLLO_SERVER_URI = Constants.expoConfig.extra.APOLLO_SERVER_URI;
-
-const httpLink = createHttpLink({
-  uri: APOLLO_SERVER_URI
-});
-
-const createApolloClient = (authStorage) => {
-  // authStorage will be used in Ex 10.14
-  // The authLink logic will be added in Exercise 10.14
-  // For now, a simple client:
+const createApolloClient = () => {
   return new ApolloClient({
-    link: httpLink, // Use httpLink directly for now
+    // Replace the IP address with your own machine's IP address!
+    uri: 'http://192.168.1.132:4000/graphql',
     cache: new InMemoryCache()
   });
 };

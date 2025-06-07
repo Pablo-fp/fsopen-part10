@@ -1,14 +1,11 @@
-// src/graphql/queries.js
 import { gql } from '@apollo/client';
 
 export const GET_REPOSITORIES = gql`
-  query GetRepositories {
-    # You can name your query
+  query {
     repositories {
       edges {
         node {
           id
-          ownerAvatarUrl
           fullName
           description
           language
@@ -16,13 +13,9 @@ export const GET_REPOSITORIES = gql`
           forksCount
           reviewCount
           ratingAverage
+          ownerAvatarUrl
         }
       }
-      # pageInfo { # Optional for now, but good for pagination later
-      #   endCursor
-      #   startCursor
-      #   hasNextPage
-      # }
     }
   }
 `;

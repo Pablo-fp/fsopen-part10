@@ -1,25 +1,24 @@
-// src/hooks/useRepositories.js
-import { useQuery } from '@apollo/client';
-import { GET_REPOSITORIES } from '../graphql/queries'; // Import your query
+import { useState, useEffect } from 'react';
 
 const useRepositories = () => {
-  const { data, error, loading, refetch } = useQuery(GET_REPOSITORIES, {
-    fetchPolicy: 'cache-and-network'
-    // Other options like variables can be added here later if needed
-  });
+  const [repositories, setRepositories] = useState();
+  const [loading, setLoading] = useState(false);
 
-  // The 'data' object directly contains 'repositories' if the query is successful
-  // So, data?.repositories would be the equivalent of the 'repositories' state previously
-  // Error handling can be added here if needed
-  if (error) {
-    console.error('Error fetching repositories:', error);
-  }
+  const fetchRepositories = async () => {
+    setLoading(true);
 
-  return {
-    repositories: data ? data.repositories : undefined, // data.repositories contains edges, pageInfo etc.
-    loading,
-    refetch // Expose refetch for potential pull-to-refresh functionality
+    const response = await fetch('http://192.168.1.132:5000/api/repositories');
+    const json = await response.json();
+
+    setLoading(false);
+    setRepositories(json);
   };
+
+  useEffect(() => {
+    fetchRepositories();
+  }, []);
+
+  return { repositories, loading, refetch: fetchRepositories };
 };
 
 export default useRepositories;

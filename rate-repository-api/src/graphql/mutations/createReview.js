@@ -89,19 +89,22 @@ export const resolvers = {
 
       const id = createReviewId(currentUser.id, repositoryId);
 
-      const existringReview = await Review.query().findById(id);
+      const existingReview = await Review.query().findById(id);
 
-      if (existringReview) {
+      if (existingReview) {
         throw new RepositoryAlreadyReviewedError();
       }
 
-      return Review.query().insertAndFetch({
+      // Create the review and return it
+      const createdReview = await Review.query().insertAndFetch({
         id,
         userId: currentUser.id,
         repositoryId,
         text: review.text,
         rating: review.rating,
       });
+
+      return createdReview;
     },
   },
 };

@@ -1,7 +1,7 @@
 import React from 'react';
-import { useParams } from 'react-router-native';
+import { useParams, useNavigate } from 'react-router-native';
 import { useQuery } from '@apollo/client';
-import { View, FlatList, StyleSheet } from 'react-native';
+import { View, FlatList, StyleSheet, Pressable } from 'react-native';
 import * as Linking from 'expo-linking';
 import { format } from 'date-fns';
 
@@ -59,6 +59,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontSize: 15,
     color: '#24292e'
+  },
+  button: {
+    backgroundColor: '#0366d6',
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+    margin: 10
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold'
   }
 });
 
@@ -87,9 +98,10 @@ const ReviewItem = ({ review }) => (
 
 const SingleRepositoryView = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { data, loading, error } = useQuery(GET_REPOSITORY, {
     variables: { id },
-    fetchPolicy: 'cache-and-network'
+    fetchPolicy: 'cache-and-network' // This ensures we get fresh data
   });
 
   if (loading) {
@@ -103,6 +115,12 @@ const SingleRepositoryView = () => {
   const repository = data?.repository;
   const reviews = repository?.reviews?.edges.map((edge) => edge.node) || [];
 
+  // Add a button to navigate to CreateReview with pre-filled data
+  const handleCreateReview = () => {
+    const [ownerName, repositoryName] = repository.fullName.split('/');
+    navigate('/create-review', { state: { ownerName, repositoryName } });
+  };
+
   return (
     <FlatList
       style={styles.container}
@@ -110,7 +128,26 @@ const SingleRepositoryView = () => {
       renderItem={({ item }) => <ReviewItem review={item} />}
       keyExtractor={(item) => item.id}
       ItemSeparatorComponent={ItemSeparator}
-      ListHeaderComponent={() => <RepositoryInfo repository={repository} />}
+      ListHeaderComponent={() => (
+        <>
+          <RepositoryInfo repository={repository} />
+          <View style={{ margin: 10 }}>
+            <Pressable
+              onPress={handleCreateReview}
+              style={{
+                backgroundColor: '#0366d6',
+                padding: 12,
+                borderRadius: 5,
+                alignItems: 'center'
+              }}
+            >
+              <Text style={{ color: 'white', fontWeight: 'bold' }}>
+                Create a review
+              </Text>
+            </Pressable>
+          </View>
+        </>
+      )}
     />
   );
 };

@@ -55,6 +55,7 @@ const AppBar = () => {
             Create a review
           </AppBarTab>
         )}
+        {user && <AppBarTab to="/my-reviews">My reviews</AppBarTab>}
         {user ? (
           <AppBarTab to="/" onPress={onSignOut}>Sign Out</AppBarTab>
         ) : (

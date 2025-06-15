@@ -1,35 +1,47 @@
 import React from 'react';
-import { View, Pressable, StyleSheet } from 'react-native';
+import { View, StyleSheet, Pressable } from 'react-native';
 import { Formik } from 'formik';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-native';
 
 import FormikTextInput from './FormikTextInput';
 import Text from './Text';
+import theme from '../theme';
 import useSignIn from '../hooks/useSignIn';
 
 const styles = StyleSheet.create({
-  // Your existing styles for the form
   container: {
-    padding: 15,
-    backgroundColor: 'white'
+    padding: 10,
+    backgroundColor: 'white',
+    width: '100%', // Occupy full width
+    alignSelf: 'flex-start' // Align to the start (top)
   },
-  button: {
-    backgroundColor: '#0366d6',
-    padding: 15,
+  input: {
+    borderColor: theme.colors.textSecondary,
+    borderWidth: 1,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 10,
+  },
+  submitButton: {
+    backgroundColor: theme.colors.primary,
+    padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    marginTop: 10
   },
-  buttonText: {
+  submitButtonText: {
     color: 'white',
-    fontWeight: 'bold'
-  }
+    fontWeight: 'bold',
+  },
+  validationError: {
+    color: 'red',
+    marginBottom: 10,
+  },
 });
 
 const validationSchema = yup.object().shape({
   username: yup.string().required('Username is required'),
-  password: yup.string().required('Password is required')
+  password: yup.string().required('Password is required'),
 });
 
 // This is the new, pure, testable component
@@ -42,18 +54,19 @@ export const SignInContainer = ({ onSubmit }) => {
     >
       {({ handleSubmit }) => (
         <View style={styles.container}>
-          <FormikTextInput name="username" placeholder="Username" />
+          <FormikTextInput name="username" placeholder="Username" style={styles.input} />
           <FormikTextInput
             name="password"
             placeholder="Password"
             secureTextEntry
+            style={styles.input}
           />
           <Pressable
             onPress={handleSubmit}
-            style={styles.button}
+            style={styles.submitButton}
             testID="submitButton"
           >
-            <Text style={styles.buttonText}>Sign in</Text>
+            <Text style={styles.submitButtonText}>Sign in</Text>
           </Pressable>
         </View>
       )}

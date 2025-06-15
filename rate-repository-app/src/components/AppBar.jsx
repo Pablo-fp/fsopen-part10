@@ -14,7 +14,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#24292e',
     paddingBottom: 15,
     paddingLeft: 10,
-    flexDirection: 'row'
+    width: '100%', // Occupy full width
+  },
+  tabContainer: {
+    flexDirection: 'row', // Tab navigation is horizontal
   },
   tab: {
     color: 'white',
@@ -23,8 +26,8 @@ const styles = StyleSheet.create({
   }
 });
 
-const AppBarTab = ({ to, children }) => (
-  <Link to={to}>
+const AppBarTab = ({ to, children, onPress }) => (
+  <Link to={to} onPress={onPress}>
     <Text style={styles.tab}>{children}</Text>
   </Link>
 );
@@ -37,20 +40,16 @@ const AppBar = () => {
   const user = data?.me;
 
   const onSignOut = async () => {
-    // 1. Remove the token from storage
     await authStorage.removeAccessToken();
-    // 2. Reset the Apollo Client store
     apolloClient.resetStore();
   };
 
   return (
     <View style={styles.container}>
-      <ScrollView horizontal>
+      <ScrollView horizontal contentContainerStyle={styles.tabContainer}>
         <AppBarTab to="/">Repositories</AppBarTab>
         {user ? (
-          <Pressable onPress={onSignOut}>
-            <Text style={styles.tab}>Sign Out</Text>
-          </Pressable>
+          <AppBarTab to="/" onPress={onSignOut}>Sign Out</AppBarTab>
         ) : (
           <AppBarTab to="/signin">Sign In</AppBarTab>
         )}

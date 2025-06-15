@@ -1,8 +1,22 @@
 import React, { useState } from 'react';
-import { View } from 'react-native';
+import { View, TextInput, StyleSheet } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
+import { useDebounce } from 'use-debounce';
 import useRepositories from '../hooks/useRepositories';
 import RepositoryListContainer from './RepositoryListContainer';
+
+const styles = StyleSheet.create({
+  searchInput: {
+    backgroundColor: 'white',
+    padding: 10,
+    borderRadius: 5,
+    marginBottom: 10,
+    marginTop: 10,
+    marginHorizontal: 10,
+    borderColor: '#e1e4e8',
+    borderWidth: 1,
+  },
+});
 
 const SORT_OPTIONS = [
   {
@@ -19,33 +33,53 @@ const SORT_OPTIONS = [
   },
 ];
 
+const RepositoryListHeader = ({ searchKeyword, setSearchKeyword, sort, setSort }) => (
+  <View>
+    <TextInput
+      style={styles.searchInput}
+      placeholder="Search"
+      value={searchKeyword}
+      onChangeText={setSearchKeyword}
+      autoCapitalize="none"
+      autoCorrect={false}
+      testID="repositorySearchInput"
+    />
+    <Picker
+      selectedValue={JSON.stringify(sort)}
+      onValueChange={(itemValue) => setSort(JSON.parse(itemValue))}
+    >
+      {SORT_OPTIONS.map((option) => (
+        <Picker.Item
+          key={option.label}
+          label={option.label}
+          value={JSON.stringify(option.value)}
+        />
+      ))}
+    </Picker>
+  </View>
+);
+
 const RepositoryList = () => {
   const [sort, setSort] = useState(SORT_OPTIONS[0].value);
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [debouncedSearchKeyword] = useDebounce(searchKeyword, 500);
 
-  // Pass the sorting variables directly to the hook
   const { repositories } = useRepositories({
     orderBy: sort.orderBy,
     orderDirection: sort.orderDirection,
+    searchKeyword: debouncedSearchKeyword,
   });
 
   return (
     <RepositoryListContainer
       repositories={repositories}
       ListHeaderComponent={
-        <View style={{ backgroundColor: 'white', padding: 10 }}>
-          <Picker
-            selectedValue={JSON.stringify(sort)}
-            onValueChange={(itemValue) => setSort(JSON.parse(itemValue))}
-          >
-            {SORT_OPTIONS.map((option) => (
-              <Picker.Item
-                key={option.label}
-                label={option.label}
-                value={JSON.stringify(option.value)}
-              />
-            ))}
-          </Picker>
-        </View>
+        <RepositoryListHeader
+          searchKeyword={searchKeyword}
+          setSearchKeyword={setSearchKeyword}
+          sort={sort}
+          setSort={setSort}
+        />
       }
     />
   );

@@ -12,7 +12,7 @@ const styles = StyleSheet.create({
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
-const RepositoryListContainer = ({ repositories }) => {
+const RepositoryListContainer = ({ repositories, ListHeaderComponent }) => {
   const navigate = useNavigate();
 
   const repositoryNodes = repositories
@@ -31,6 +31,7 @@ const RepositoryListContainer = ({ repositories }) => {
       ItemSeparatorComponent={ItemSeparator}
       renderItem={renderItem}
       keyExtractor={(item) => item.id}
+      ListHeaderComponent={ListHeaderComponent}
     />
   );
 };

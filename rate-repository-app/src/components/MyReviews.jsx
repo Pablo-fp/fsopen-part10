@@ -1,84 +1,125 @@
 import React from 'react';
-import { View, FlatList, StyleSheet } from 'react-native';
-import { useQuery } from '@apollo/client';
+import { View, FlatList, StyleSheet, Pressable, Alert } from 'react-native';
+import { useMutation } from '@apollo/client';
+import { useNavigate } from 'react-router-native';
 import { format } from 'date-fns';
 import Text from './Text';
 import { GET_CURRENT_USER } from '../graphql/queries';
+import { DELETE_REVIEW } from '../graphql/mutations';
+import { useQuery } from '@apollo/client';
 
 const styles = StyleSheet.create({
-  reviewContainer: {
+  buttonRow: {
     flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: 15,
-    marginBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e1e4e8'
+    justifyContent: 'space-between',
+    marginTop: 10
   },
-  ratingCircle: {
-    width: 45,
-    height: 45,
-    borderRadius: 22.5,
-    borderWidth: 3,
-    borderColor: '#0366d6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 15
-  },
-  ratingText: {
-    color: '#0366d6',
-    fontWeight: 'bold',
-    fontSize: 18
-  },
-  reviewContent: {
+  viewButton: {
+    backgroundColor: '#0366d6',
+    padding: 10,
+    borderRadius: 5,
     flex: 1,
-    flexDirection: 'column'
+    marginRight: 5,
+    alignItems: 'center'
   },
-  repoName: {
-    fontWeight: 'bold',
-    marginBottom: 4
+  deleteButton: {
+    backgroundColor: '#d73a4a',
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginLeft: 5,
+    alignItems: 'center'
   },
-  date: {
-    color: '#586069',
-    fontSize: 14,
-    marginBottom: 4
-  },
-  reviewText: {
-    fontSize: 15,
-    color: '#24292e'
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold'
   }
 });
 
-const ReviewItem = ({ review }) => (
-  <View style={styles.reviewContainer}>
-    <View style={styles.ratingCircle}>
-      <Text style={styles.ratingText}>{review.rating}</Text>
+const ReviewItem = ({ review, onViewRepository, onDelete }) => (
+  <View style={{ backgroundColor: 'white', padding: 15, marginBottom: 10 }}>
+    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <View
+        style={{
+          width: 45,
+          height: 45,
+          borderRadius: 22.5,
+          borderWidth: 3,
+          borderColor: '#0366d6',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginRight: 15
+        }}
+      >
+        <Text style={{ color: '#0366d6', fontWeight: 'bold', fontSize: 18 }}>
+          {review.rating}
+        </Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text fontWeight="bold">{review.repository.fullName}</Text>
+        <Text color="textSecondary">
+          {format(new Date(review.createdAt), 'dd.MM.yyyy')}
+        </Text>
+        <Text>{review.text}</Text>
+      </View>
     </View>
-    <View style={styles.reviewContent}>
-      <Text style={styles.repoName}>{review.repository.fullName}</Text>
-      <Text style={styles.date}>
-        {format(new Date(review.createdAt), 'dd.MM.yyyy')}
-      </Text>
-      <Text style={styles.reviewText}>{review.text}</Text>
+    <View style={styles.buttonRow}>
+      <Pressable style={styles.viewButton} onPress={onViewRepository}>
+        <Text style={styles.buttonText}>View repository</Text>
+      </Pressable>
+      <Pressable style={styles.deleteButton} onPress={onDelete}>
+        <Text style={styles.buttonText}>Delete review</Text>
+      </Pressable>
     </View>
   </View>
 );
 
 const MyReviews = () => {
-  const { data, loading, error } = useQuery(GET_CURRENT_USER, {
-    variables: { includeReviews: true },
-    fetchPolicy: 'cache-and-network'
+  const { data, refetch } = useQuery(GET_CURRENT_USER, {
+    variables: { includeReviews: true }
   });
+  const [deleteReview] = useMutation(DELETE_REVIEW);
+  const navigate = useNavigate();
 
-  if (loading) return <Text>Loading...</Text>;
-  if (error) return <Text>Error: {error.message}</Text>;
+  if (!data?.me?.reviews) return null;
 
-  const reviews = data?.me?.reviews?.edges.map(edge => edge.node) || [];
+  const reviews = data.me.reviews.edges.map((edge) => edge.node);
+
+  const handleDelete = (id) => {
+    Alert.alert(
+      'Delete review',
+      'Are you sure you want to delete this review?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await deleteReview({ variables: { id } });
+              refetch();
+            } catch (e) {
+              Alert.alert('Error', 'Could not delete review.');
+            }
+          }
+        }
+      ]
+    );
+  };
 
   return (
     <FlatList
       data={reviews}
-      renderItem={({ item }) => <ReviewItem review={item} />}
-      keyExtractor={item => item.id}
+      keyExtractor={(item) => item.id}
+      renderItem={({ item }) => (
+        <ReviewItem
+          review={item}
+          onViewRepository={() =>
+            navigate(`/repositories/${item.repository.id}`)
+          }
+          onDelete={() => handleDelete(item.id)}
+        />
+      )}
     />
   );
 };

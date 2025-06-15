@@ -9,6 +9,8 @@ import RepositoryItem from './RepositoryItem';
 import Text from './Text';
 import { GET_REPOSITORY } from '../graphql/queries';
 
+const REVIEWS_PAGE_SIZE = 4; // Use a small value for testing
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -99,9 +101,9 @@ const ReviewItem = ({ review }) => (
 const SingleRepositoryView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data, loading, error } = useQuery(GET_REPOSITORY, {
-    variables: { id },
-    fetchPolicy: 'cache-and-network' // This ensures we get fresh data
+  const { data, loading, error, fetchMore } = useQuery(GET_REPOSITORY, {
+    variables: { id, first: REVIEWS_PAGE_SIZE },
+    fetchPolicy: 'cache-and-network'
   });
 
   if (loading) {
@@ -114,8 +116,19 @@ const SingleRepositoryView = () => {
 
   const repository = data?.repository;
   const reviews = repository?.reviews?.edges.map((edge) => edge.node) || [];
+  const pageInfo = repository?.reviews?.pageInfo;
 
-  // Add a button to navigate to CreateReview with pre-filled data
+  const handleFetchMore = () => {
+    if (!pageInfo?.hasNextPage) return;
+    fetchMore({
+      variables: {
+        id,
+        after: pageInfo.endCursor,
+        first: REVIEWS_PAGE_SIZE,
+      },
+    });
+  };
+
   const handleCreateReview = () => {
     const [ownerName, repositoryName] = repository.fullName.split('/');
     navigate('/create-review', { state: { ownerName, repositoryName } });
@@ -148,6 +161,8 @@ const SingleRepositoryView = () => {
           </View>
         </>
       )}
+      onEndReached={handleFetchMore}
+      onEndReachedThreshold={0.5}
     />
   );
 };
